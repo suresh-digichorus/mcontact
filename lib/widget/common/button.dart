@@ -6,18 +6,20 @@ class PrimaryButton extends StatelessWidget {
   final String title;
   final bool? isEnable;
   final Color? bgColor;
+  final IconData? icon;
   const PrimaryButton({
     super.key,
     required this.onTap,
     required this.title,
     this.isEnable,
     this.bgColor,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => isEnable == null || isEnable! ? onTap() : null,
+      onPressed: () => onTap(),
       style: ButtonStyle(
         backgroundColor: bgColor != null
             ? MaterialStateProperty.all(bgColor)
@@ -32,7 +34,18 @@ class PrimaryButton extends StatelessWidget {
           ),
         ),
       ),
-      child: Text(title),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: Icon(icon),
+            )
+          ],
+          Text(title),
+        ],
+      ),
     );
   }
 }

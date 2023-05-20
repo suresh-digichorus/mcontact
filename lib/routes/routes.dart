@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mcontact/layout/base_layout.dart';
+import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/screens/01_splash_screen/splash_screen.dart';
 import 'package:mcontact/screens/02_contact/contact_screen.dart';
+import 'package:mcontact/screens/02_contact/person_details_screen.dart';
+import 'package:mcontact/screens/03_scan/my_qr_code_screen.dart';
+import 'package:mcontact/screens/03_scan/scan_screen.dart';
 import 'package:mcontact/screens/04_favorite/favorite_screen.dart';
-import 'package:mcontact/screens/05_profile/my_details_screen.dart';
+import 'package:mcontact/screens/05_profile/profile_add_or_update_screen.dart';
 
 class Routes {
   static const splashScreen = '/splash-screen';
-  static const myDetailsScreen = '/my-details-screen';
+  static const profileAddOrUpdateScreen = '/my-details-screen';
   static const contactScreen = '/contact-screen';
   static const favoriteScreen = '/favorite-screen';
+  static const personDetailsScreen = '/person-details-screen';
+  static const scanScreen = '/scan-screen';
+  static const myQrCodeScreen = '/my-qr-code-screen';
 
   static Map<String, WidgetBuilder> get buildRoutes {
     return {
@@ -18,8 +25,8 @@ class Routes {
             showAppBar: false,
             showBottomNavBar: false,
           ),
-      myDetailsScreen: (context) => const BaseLayout(
-            page: MyDetailsScreen(),
+      profileAddOrUpdateScreen: (context) => const BaseLayout(
+            page: ProfileAddOrUpdateScreen(),
             showAppBar: false,
             showBottomNavBar: false,
           ),
@@ -32,6 +39,24 @@ class Routes {
             page: FavoriteScreen(),
             showAppBar: false,
             showBottomNavBar: true,
+          ),
+      personDetailsScreen: (context) => const BaseLayout(
+            page: PersonDetailsScreen(),
+            showAppBar: true,
+            showBottomNavBar: false,
+            title: Strings.details,
+          ),
+      scanScreen: (context) => const BaseLayout(
+            page: ScanScreen(),
+            showAppBar: true,
+            showBottomNavBar: false,
+            title: Strings.scanQrCode,
+          ),
+      myQrCodeScreen: (context) => const BaseLayout(
+            page: MyQrCodeScreen(),
+            showAppBar: true,
+            showBottomNavBar: false,
+            title: Strings.showMyQr,
           ),
     };
   }

@@ -30,10 +30,13 @@ class Themes {
             AppColors.primaryColor,
           ),
           textStyle: MaterialStateProperty.all(
-            const TextStyle(fontSize: 16),
+            const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           padding: MaterialStateProperty.all(
-            const EdgeInsets.symmetric(vertical: 16),
+            const EdgeInsets.symmetric(vertical: 20),
           ),
         ),
       );
@@ -64,6 +67,7 @@ class Themes {
             .textTheme
             .titleSmall!
             .copyWith(color: AppColors.grey2e),
+        prefixIconColor: AppColors.primaryColor,
       );
 
 // TODO: set the font family

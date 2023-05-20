@@ -15,4 +15,17 @@ class Strings {
   static const enterAddress = 'Enter Address';
   static const uploadProfilePicture = 'Upload Profile Picture';
   static const submit = 'Submit';
+  static const welcome = 'Welcome,';
+  static const contacts = 'Contacts';
+  static const search = 'Search';
+  static const details = 'Details';
+  static const shareContact = 'Share Contact';
+  static const modify = 'Modify';
+  static const delete = 'Delete';
+  static const favorite = 'Favorite';
+  static const scanQrCode = 'Scan QR Code';
+  static const uploadQr = 'Upload QR';
+  static const addContactManually = 'Add Contact Manually';
+  static const showMyQr = 'Show My QR';
+  static const ok = 'OK';
 }

@@ -3,7 +3,7 @@ import 'package:mcontact/routes/routes.dart';
 import 'package:mcontact/screens/01_splash_screen/splash_screen.dart';
 import 'package:mcontact/screens/02_contact/contact_screen.dart';
 import 'package:mcontact/screens/04_favorite/favorite_screen.dart';
-import 'package:mcontact/screens/05_profile/my_details_screen.dart';
+import 'package:mcontact/screens/05_profile/profile_add_or_update_screen.dart';
 import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
 import 'package:mcontact/utils/utils.dart';
@@ -58,13 +58,11 @@ class _BaseLayoutState extends State<BaseLayout> {
     for (int i = 0; i < isActiveList.length; i++) {
       if (index == 0) {
         isActiveList[index] = true;
-      } else {
+      } else if (index != 1) {
         isActiveList[i] = false;
       }
       if (index == 1) {
-        isActiveList[index] = true;
-      } else {
-        isActiveList[i] = false;
+        break;
       }
       if (index == 2) {
         isActiveList[index] = true;
@@ -72,11 +70,12 @@ class _BaseLayoutState extends State<BaseLayout> {
         isActiveList[i] = false;
       }
     }
+
     setState(() {});
   }
 
   void gotoScanScreen() {
-    Navigation.pushNamed(context, Routes.myDetailsScreen);
+    Navigation.pushNamed(context, Routes.scanScreen);
   }
 
   @override
