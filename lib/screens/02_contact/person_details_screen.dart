@@ -9,6 +9,7 @@ import 'package:mcontact/widget/common/black_space_widget.dart';
 import 'package:mcontact/widget/common/button.dart';
 import 'package:mcontact/widget/common/loading_overlay.dart';
 import 'package:mcontact/widget/person_details/person_details_card_widget.dart';
+import 'package:mcontact/widget/toast/toast.dart';
 
 class PersonDetailsScreen extends StatefulWidget {
   const PersonDetailsScreen({super.key});
@@ -60,6 +61,10 @@ class _PersonDetailsScreenState extends State<PersonDetailsScreen> {
     Navigation.pushNamed(context, Routes.profileAddOrUpdateScreen, {'id': id});
   }
 
+  void onTapShare() {
+    showToast(Strings.inProgress);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -78,7 +83,7 @@ class _PersonDetailsScreenState extends State<PersonDetailsScreen> {
                       children: [
                         Expanded(
                           child: PrimaryButton(
-                            onTap: () {},
+                            onTap: onTapShare,
                             title: Strings.shareContact,
                             bgColor: AppColors.green5b,
                           ),
@@ -104,7 +109,7 @@ class _PersonDetailsScreenState extends State<PersonDetailsScreen> {
                       children: [
                         Expanded(
                           child: PrimaryButton(
-                            onTap: () {},
+                            onTap: onTapShare,
                             title: Strings.delete,
                           ),
                         ),

@@ -1,10 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:mcontact/core/model/contact_details_list_temp.dart';
+import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
+import 'package:mcontact/utils/regx.dart';
 import 'package:mcontact/widget/common/button.dart';
+import 'package:mcontact/widget/common/sliver_app_bar.dart';
 import 'package:mcontact/widget/common/text_field.dart';
+import 'package:mcontact/widget/toast/toast.dart';
 
 class ProfileAddOrUpdateScreen extends StatefulWidget {
   const ProfileAddOrUpdateScreen({super.key});
@@ -47,6 +53,8 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
 
   Person? person;
 
+  ScrollController scrollController = ScrollController();
+
   void fetchData() {
     if (ModalRoute.of(context)!.settings.arguments != null) {
       args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -76,16 +84,8 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
     setState(() {});
   }
 
-  bool validator(TextEditingController controller) {
-    if (controller.text.isEmpty) {
-      return false;
-    }
-    return true;
-  }
-
-  onChanged(String value) {
-    // print(value);
-  }
+  bool emailValidator(String email) =>
+      RegExp(Regx.emailValidate).hasMatch(email);
 
   bool setSumbitButton() {
     if (nameController.text.isNotEmpty &&
@@ -107,6 +107,8 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
     }
   }
 
+  void onChanged(String value) {}
+
   submitOntap() {
     if (emailController.text.isEmpty) {
       emailFocus.requestFocus();
@@ -122,8 +124,17 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
       mobileFocus.requestFocus();
     } else if (addressController.text.isEmpty) {
       addressFocus.requestFocus();
+    } else if (emailValidator(emailController.text)) {
+      isEnabileSubmit = true;
+      setState(() {});
+    } else {
+      isEnabileSubmit = false;
+      setState(() {});
+
+      emailFocus.requestFocus();
+      showToast(Strings.pleaseEnterAValidEmail);
     }
-    if (setSumbitButton()) {
+    if (isEnabileSubmit) {
       Navigation.pop(context);
     }
   }
@@ -132,37 +143,13 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
   Widget build(BuildContext context) {
     return NestedScrollView(
       floatHeaderSlivers: false,
+      controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar(
-          snap: true,
-          floating: true,
-          pinned: true,
-          centerTitle: true,
-          expandedHeight: 150,
-          actions: const [
-            // Image.asset(
-            //   Images.logo,
-            //   width: 100,
-            // ),
-          ],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text('data'),
-            ],
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size(double.infinity, 50),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                'My Details',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.white,
-                    ),
-              ),
-            ),
-          ),
+        CommonSliverAppBar(
+          scrollController: scrollController,
+          name: nameController.text,
+          imagePath: Images.logo,
+          title: Strings.myDetails,
         )
       ],
       body: SingleChildScrollView(

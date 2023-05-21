@@ -11,7 +11,7 @@ import 'package:mcontact/screens/05_profile/profile_add_or_update_screen.dart';
 
 class Routes {
   static const splashScreen = '/splash-screen';
-  static const profileAddOrUpdateScreen = '/my-details-screen';
+  static const profileAddOrUpdateScreen = '/profile-add-or-update-screen';
   static const contactScreen = '/contact-screen';
   static const favoriteScreen = '/favorite-screen';
   static const personDetailsScreen = '/person-details-screen';
@@ -63,7 +63,7 @@ class Routes {
 
 //initial route
 
-  static String get initialRoute => Routes.contactScreen;
+  static String get initialRoute => Routes.splashScreen;
 
 //unknown Route
   static Function get unknownRoute {

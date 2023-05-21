@@ -28,4 +28,7 @@ class Strings {
   static const addContactManually = 'Add Contact Manually';
   static const showMyQr = 'Show My QR';
   static const ok = 'OK';
+  static const myDetails = 'My details';
+  static const inProgress = 'in-progress';
+  static const pleaseEnterAValidEmail = 'Please enter a valid email';
 }

@@ -5,6 +5,7 @@ import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
 import 'package:mcontact/widget/common/black_space_widget.dart';
 import 'package:mcontact/widget/common/button.dart';
+import 'package:mcontact/widget/toast/toast.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -25,15 +26,17 @@ class _ScanScreenState extends State<ScanScreen> {
     Navigation.pushReplacementNamed(context, Routes.myQrCodeScreen);
   }
 
+  void onTapUploadQr() {
+    showToast(Strings.inProgress);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         MobileScanner(
           controller: mobileScannerController,
-          onDetect: (value) {
-            print(value);
-          },
+          onDetect: (value) {},
         ),
         Positioned(
           left: 0,
@@ -48,7 +51,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   children: [
                     Expanded(
                       child: PrimaryButton(
-                        onTap: () {},
+                        onTap: onTapUploadQr,
                         title: Strings.uploadQr,
                         icon: Icons.file_upload_outlined,
                       ),

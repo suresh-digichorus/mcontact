@@ -1,18 +1,15 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:mcontact/core/model/contact_details_list_temp.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mcontact/bloc/contact/contact_bloc.dart';
 import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/routes/routes.dart';
-import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
-import 'package:mcontact/utils/utils.dart';
 import 'package:mcontact/widget/common/loading_overlay.dart';
+import 'package:mcontact/widget/common/sliver_app_bar.dart';
 import 'package:mcontact/widget/common/text_field.dart';
 import 'package:mcontact/widget/contact/contact_card_widget.dart';
-import 'package:mcontact/widget/contact/welcome_avatar_widget.dart';
-import 'package:mcontact/widget/containers/containers.dart';
+import 'package:mcontact/widget/toast/toast.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -22,19 +19,20 @@ class ContactScreen extends StatefulWidget {
 }
 
 class _ContactScreenState extends State<ContactScreen> {
+  late ContactBloc contactBloc;
   @override
   void initState() {
     super.initState();
+    contactBloc = BlocProvider.of<ContactBloc>(context, listen: false);
     fetchData();
   }
 
   TextEditingController searchController = TextEditingController();
 
-  ContactListResponseModel? contactListResponseModel;
+  ScrollController scrollController = ScrollController();
 
   void fetchData() async {
-    var tempString = ContactsList.getContactList();
-    contactListResponseModel = contactListResponseModelFromJson(tempString);
+    contactBloc.add(ContactListEvent());
   }
 
   void gotoPersonDetailsScreen(int id) {
@@ -45,44 +43,20 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
+  void onTapFavorite() {
+    showToast(Strings.inProgress);
+  }
+
   @override
   Widget build(BuildContext context) {
     return NestedScrollView(
+      controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar(
-          snap: true,
-          floating: true,
-          pinned: true,
-          centerTitle: true,
-          expandedHeight: 150,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-//TODO: do the opacity
-              WelcomeAvatar(
-                name: 'Shahid Ahmed',
-                filePath: Images.logo,
-              ),
-            ],
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size(double.infinity, 50),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 26, bottom: 10),
-              child: Row(
-                children: [
-                  Text(
-                    Strings.contacts,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: AppColors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        CommonSliverAppBar(
+          scrollController: scrollController,
+          name: 'Shahid Ahmed',
+          title: Strings.contacts,
+          imagePath: Images.logo,
         )
       ],
       body: SingleChildScrollView(
@@ -95,28 +69,37 @@ class _ContactScreenState extends State<ContactScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: SearchBarWidget(controller: searchController),
               ),
-              (contactListResponseModel == null)
-                  ? const LoadingOverlay()
-                  : Center(
-                      child: Wrap(
-                        runSpacing: 20,
-                        spacing: 20,
-                        children: contactListResponseModel!.persons
-                            .map(
-                              (e) => ContactCardWidget(
-                                imagePath: Images.logo,
-                                name: e.name,
-                                number: e.phoneNumber,
-                                email: e.email,
-                                isFavorite: e.isFavorite,
-                                onTap: gotoPersonDetailsScreen,
-                                onTapFavorite: () {},
-                                id: e.id,
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
+              BlocConsumer(
+                bloc: contactBloc,
+                listener: (context, state) {},
+                buildWhen: (previous, current) {
+                  return true;
+                },
+                builder: (BuildContext context, ContactState contatctstate) =>
+                    (contactBloc.contactListResponseModel == null)
+                        ? const LoadingOverlay()
+                        : Center(
+                            child: Wrap(
+                              runSpacing: 20,
+                              spacing: 20,
+                              children:
+                                  contactBloc.contactListResponseModel!.persons
+                                      .map(
+                                        (e) => ContactCardWidget(
+                                          imagePath: Images.logo,
+                                          name: e.name,
+                                          number: e.phoneNumber,
+                                          email: e.email,
+                                          isFavorite: e.isFavorite,
+                                          onTap: gotoPersonDetailsScreen,
+                                          onTapFavorite: onTapFavorite,
+                                          id: e.id,
+                                        ),
+                                      )
+                                      .toList(),
+                            ),
+                          ),
+              )
             ],
           ),
         ),

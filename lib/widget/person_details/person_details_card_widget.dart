@@ -22,7 +22,7 @@ class _PersonDetailsCardWidgetState extends State<PersonDetailsCardWidget>
     super.initState();
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 400),
     );
     swapAnimation = Tween(begin: 0.0, end: 1.0).animate(animationController)
       ..addListener(() {

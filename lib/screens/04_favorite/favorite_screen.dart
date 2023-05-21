@@ -3,11 +3,12 @@ import 'package:mcontact/core/model/contact_details_list_temp.dart';
 import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/routes/routes.dart';
-import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
 import 'package:mcontact/widget/common/loading_overlay.dart';
+import 'package:mcontact/widget/common/sliver_app_bar.dart';
 import 'package:mcontact/widget/common/text_field.dart';
 import 'package:mcontact/widget/contact/contact_card_widget.dart';
+import 'package:mcontact/widget/toast/toast.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -22,6 +23,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   List<Person> person = [];
 
   TextEditingController searchController = TextEditingController();
+
+  ScrollController scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -48,41 +51,20 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     );
   }
 
+  void onTapFavorite() {
+    showToast(Strings.inProgress);
+  }
+
   @override
   Widget build(BuildContext context) {
     return NestedScrollView(
+      controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar(
-          snap: true,
-          floating: true,
-          pinned: true,
-          centerTitle: true,
-          expandedHeight: 150,
-          actions: const [],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text('data'),
-            ],
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size(double.infinity, 50),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 26, bottom: 10),
-              child: Row(
-                children: [
-                  Text(
-                    Strings.favorite,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: AppColors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        CommonSliverAppBar(
+          scrollController: scrollController,
+          name: 'Shahid Ahmed',
+          title: Strings.favorite,
+          imagePath: Images.logo,
         )
       ],
       body: SingleChildScrollView(
@@ -110,7 +92,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                 email: e.email,
                                 isFavorite: e.isFavorite,
                                 onTap: gotoPersonDetailsScreen,
-                                onTapFavorite: () {},
+                                onTapFavorite: onTapFavorite,
                                 id: e.id,
                               ),
                             )

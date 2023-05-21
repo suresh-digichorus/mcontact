@@ -4,7 +4,8 @@ import 'package:mcontact/themes/colors.dart';
 class WhiteBorderAvatar extends StatelessWidget {
   final String imagePath;
   const WhiteBorderAvatar({
-    super.key, required this.imagePath,
+    super.key,
+    required this.imagePath,
   });
 
   @override
@@ -21,9 +22,7 @@ class WhiteBorderAvatar extends StatelessWidget {
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(100),
-          child: Image.asset(
-           imagePath
-          ),
+          child: Image.asset(imagePath),
         ),
       ),
     );

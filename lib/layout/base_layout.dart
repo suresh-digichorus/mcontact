@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mcontact/routes/routes.dart';
-import 'package:mcontact/screens/01_splash_screen/splash_screen.dart';
 import 'package:mcontact/screens/02_contact/contact_screen.dart';
 import 'package:mcontact/screens/04_favorite/favorite_screen.dart';
-import 'package:mcontact/screens/05_profile/profile_add_or_update_screen.dart';
-import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
-import 'package:mcontact/utils/utils.dart';
 import 'package:mcontact/widget/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:mcontact/widget/common/app_bar.dart';
-import 'package:mcontact/widget/common/button.dart';
 
 int globalBottmNavIndex = 0;
 
