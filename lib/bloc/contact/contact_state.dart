@@ -20,3 +20,32 @@ class ContactErrorState extends ContactState {
   @override
   List<Object?> get props => [error];
 }
+
+class AddOrRemoveFavoriteState extends ContactState {
+  final bool success;
+  AddOrRemoveFavoriteState(this.success);
+  @override
+  List<Object?> get props => [success];
+}
+
+class UpdateContactState extends ContactState {
+  final bool isUpdated;
+  UpdateContactState(this.isUpdated);
+  @override
+  List<Object?> get props => [isUpdated];
+}
+
+class AddContactState extends ContactState {
+  final bool isAddedd;
+  AddContactState(this.isAddedd);
+  @override
+  List<Object?> get props => [isAddedd];
+}
+
+
+class DeleteContactState extends ContactState {
+  final bool isDeleted;
+  DeleteContactState(this.isDeleted);
+  @override
+  List<Object?> get props => [isDeleted];
+}

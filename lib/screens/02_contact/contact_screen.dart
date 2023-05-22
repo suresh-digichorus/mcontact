@@ -43,8 +43,12 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
-  void onTapFavorite() {
-    showToast(Strings.inProgress);
+  void onTapFavorite(int id) {
+    contactBloc.add(AddOrRemoveFavoriteEvent(id));
+  }
+
+  void searhcOnTap() {
+    Navigation.pushNamed(context, Routes.searchScreen);
   }
 
   @override
@@ -67,36 +71,60 @@ class _ContactScreenState extends State<ContactScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                child: SearchBarWidget(controller: searchController),
+                child: Stack(
+                  children: [
+                    SearchBarWidget(controller: searchController),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          searhcOnTap();
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
               BlocConsumer(
                 bloc: contactBloc,
-                listener: (context, state) {},
+                listener: (context, state) {
+                  if (state is AddOrRemoveFavoriteState) {
+                    contactBloc.add(ContactListEvent());
+                    showToast(Strings.updated);
+                  }
+                },
                 buildWhen: (previous, current) {
                   return true;
                 },
                 builder: (BuildContext context, ContactState contatctstate) =>
                     (contactBloc.contactListResponseModel == null)
                         ? const LoadingOverlay()
-                        : Center(
-                            child: Wrap(
-                              runSpacing: 20,
-                              spacing: 20,
-                              children:
-                                  contactBloc.contactListResponseModel!.persons
-                                      .map(
-                                        (e) => ContactCardWidget(
-                                          imagePath: Images.logo,
-                                          name: e.name,
-                                          number: e.phoneNumber,
-                                          email: e.email,
-                                          isFavorite: e.isFavorite,
-                                          onTap: gotoPersonDetailsScreen,
-                                          onTapFavorite: onTapFavorite,
-                                          id: e.id,
-                                        ),
-                                      )
-                                      .toList(),
+                        : Padding(
+                            padding: const EdgeInsets.only(bottom: 100),
+                            child: Center(
+                              child: Wrap(
+                                runSpacing: 20,
+                                spacing: 20,
+                                children: contactBloc
+                                    .contactListResponseModel!.persons
+                                    .map(
+                                  (e) {
+                                    return ContactCardWidget(
+                                      imagePath: e.avatarPath,
+                                      name: e.name,
+                                      number: e.phoneNumber,
+                                      email: e.email,
+                                      isFavorite: e.isFavorite,
+                                      onTap: gotoPersonDetailsScreen,
+                                      onTapFavorite: onTapFavorite,
+                                      id: e.id,
+                                    );
+                                  },
+                                ).toList(),
+                              ),
                             ),
                           ),
               )

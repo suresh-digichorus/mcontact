@@ -31,4 +31,8 @@ class Strings {
   static const myDetails = 'My details';
   static const inProgress = 'in-progress';
   static const pleaseEnterAValidEmail = 'Please enter a valid email';
+  static const pleaseWait = 'Please wait';
+  static const updated = 'Updated';
+  static const added = 'Added';
+  static const contactDeleted = 'Contact deleted';
 }

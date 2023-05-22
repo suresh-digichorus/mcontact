@@ -1,12 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mcontact/bloc/contact/contact_bloc.dart';
 import 'package:mcontact/core/model/contact_details_list_temp.dart';
 import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/navigation.dart';
 import 'package:mcontact/utils/regx.dart';
+import 'package:mcontact/utils/utils.dart';
 import 'package:mcontact/widget/common/button.dart';
 import 'package:mcontact/widget/common/sliver_app_bar.dart';
 import 'package:mcontact/widget/common/text_field.dart';
@@ -24,6 +26,8 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
   @override
   void initState() {
     super.initState();
+    contactBloc = BlocProvider.of<ContactBloc>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       fetchData();
     });
@@ -32,6 +36,10 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
   var args = {};
 
   bool isEnabileSubmit = false;
+
+  late ContactBloc contactBloc;
+
+  String imagePath = '';
 
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -58,17 +66,19 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
   void fetchData() {
     if (ModalRoute.of(context)!.settings.arguments != null) {
       args = ModalRoute.of(context)!.settings.arguments as Map;
-      if (args['id'] != null) {
-        var contactList = ContactsList.getContactList();
-        for (int i = 0;
-            i < contactListResponseModelFromJson(contactList).persons.length;
-            i++) {
+      if (args["id"] != null) {
+        var contactListResponseModel = contactBloc.contactListResponseModel!;
+        for (int i = 0; i < contactListResponseModel.persons.length; i++) {
           if (int.parse(args["id"].toString()) ==
-              contactListResponseModelFromJson(contactList).persons[i].id) {
-            person = contactListResponseModelFromJson(contactList).persons[i];
+              contactListResponseModel.persons[i].id) {
+            person = contactListResponseModel.persons[i];
             initTextEditController(person!);
           }
         }
+      }
+      if (args["is_qr"] != null && args["is_qr"]) {
+        var person = args["person"] as Person;
+        initTextEditController(person);
       }
     }
   }
@@ -135,135 +145,202 @@ class _ProfileAddOrUpdateScreenState extends State<ProfileAddOrUpdateScreen> {
       showToast(Strings.pleaseEnterAValidEmail);
     }
     if (isEnabileSubmit) {
-      Navigation.pop(context);
+      if (args['id'] != null) {
+        updateContact();
+      } else {
+        addContact();
+      }
+    }
+  }
+
+  Future<void> addContact() async {
+    contactBloc.add(
+      AddContactEvent(
+        emailController.text,
+        nameController.text,
+        companyController.text,
+        websiteController.text,
+        designationController.text,
+        mobileNumberController.text,
+        addressController.text,
+        imagePath,
+      ),
+    );
+  }
+
+  Future<void> updateContact() async {
+    contactBloc.add(
+      UpdateContactEvent(
+          int.parse(args["id"].toString()),
+          emailController.text,
+          nameController.text,
+          companyController.text,
+          websiteController.text,
+          designationController.text,
+          mobileNumberController.text,
+          addressController.text,
+          imagePath),
+    );
+  }
+
+  void onTapUploadProfilePicture() async {
+    final ImagePicker imagePicker = ImagePicker();
+    XFile? imageList = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (imageList != null) {
+      var image = await Utils.cropImage(imageList.path);
+      if (image != null) {
+        imagePath = image.path;
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      floatHeaderSlivers: false,
-      controller: scrollController,
-      headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        CommonSliverAppBar(
-          scrollController: scrollController,
-          name: nameController.text,
-          imagePath: Images.logo,
-          title: Strings.myDetails,
-        )
-      ],
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Column(
-            children: [
-//Email
-              Form(
-                key: formKey,
-                onChanged: () {
-                  setSumbitButton();
-                },
-                child: Column(
-                  children: [
-                    PrimaryTextFormField(
-                      controller: emailController,
-                      hintText: Strings.enterEmail,
-                      floatingHintText: Strings.email,
-                      onChang: onChanged,
-                      focusNode: emailFocus,
-                    ),
+    return BlocConsumer(
+      bloc: contactBloc,
+      listener: (context, state) {
+        if (state is UpdateContactState) {
+          contactBloc.add(ContactListEvent());
+        }
+        if (state is AddContactState) {
+          contactBloc.add(ContactListEvent());
+        }
+        if (state is ContactListState) {
+          if (args["id"] == null) {
+            showToast(Strings.added);
+          } else {
+            showToast(Strings.updated);
+          }
 
-                    //Name
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 22),
-                      child: PrimaryTextFormField(
-                        controller: nameController,
-                        hintText: Strings.enterFullName,
-                        floatingHintText: Strings.name,
-                        focusNode: nameFocus,
-                      ),
-                    ),
-
-                    // Company name
-                    PrimaryTextFormField(
-                      controller: companyController,
-                      hintText: Strings.enterCompanyName,
-                      floatingHintText: Strings.companyName,
-                      focusNode: companyFocus,
-                    ),
-
-                    // Website
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 22),
-                      child: PrimaryTextFormField(
-                        controller: websiteController,
-                        hintText: Strings.enterWebsite,
-                        floatingHintText: Strings.website,
-                        keyboardType: TextInputType.url,
-                        focusNode: websiteFocus,
-                      ),
-                    ),
-
-                    // Designation
-                    PrimaryTextFormField(
-                      controller: designationController,
-                      hintText: Strings.enterDesignationPosition,
-                      floatingHintText: Strings.designation,
-                      focusNode: designationFocus,
-                    ),
-
-                    // Mobile number
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 22),
-                      child: PrimaryTextFormField(
-                        controller: mobileNumberController,
-                        hintText: Strings.enterMobileNumber,
-                        floatingHintText: Strings.mobileNumber,
-                        keyboardType: TextInputType.number,
-                        focusNode: mobileFocus,
-                      ),
-                    ),
-
-                    // Address
-                    PrimaryTextFormField(
-                      controller: addressController,
-                      hintText: Strings.enterAddress,
-                      floatingHintText: Strings.address,
-                      keyboardType: TextInputType.streetAddress,
-                      focusNode: addressFocus,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 22),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: PrimaryButton(
-                        onTap: () {},
-                        title: Strings.uploadProfilePicture,
-                        bgColor: AppColors.green5b,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
+          Navigation.pop(context);
+        }
+      },
+      builder: (context, state) {
+        return NestedScrollView(
+          floatHeaderSlivers: false,
+          controller: scrollController,
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            CommonSliverAppBar(
+              scrollController: scrollController,
+              name: nameController.text,
+              imagePath: Images.logo,
+              title: Strings.myDetails,
+            )
+          ],
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: PrimaryButton(
-                      onTap: submitOntap,
-                      isEnable: isEnabileSubmit,
-                      title: Strings.submit,
+                  //Email
+                  Form(
+                    key: formKey,
+                    onChanged: () {
+                      setSumbitButton();
+                    },
+                    child: Column(
+                      children: [
+                        PrimaryTextFormField(
+                          controller: emailController,
+                          hintText: Strings.enterEmail,
+                          floatingHintText: Strings.email,
+                          onChang: onChanged,
+                          focusNode: emailFocus,
+                        ),
+
+                        //Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          child: PrimaryTextFormField(
+                            controller: nameController,
+                            hintText: Strings.enterFullName,
+                            floatingHintText: Strings.name,
+                            focusNode: nameFocus,
+                          ),
+                        ),
+
+                        // Company name
+                        PrimaryTextFormField(
+                          controller: companyController,
+                          hintText: Strings.enterCompanyName,
+                          floatingHintText: Strings.companyName,
+                          focusNode: companyFocus,
+                        ),
+
+                        // Website
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          child: PrimaryTextFormField(
+                            controller: websiteController,
+                            hintText: Strings.enterWebsite,
+                            floatingHintText: Strings.website,
+                            keyboardType: TextInputType.url,
+                            focusNode: websiteFocus,
+                          ),
+                        ),
+
+                        // Designation
+                        PrimaryTextFormField(
+                          controller: designationController,
+                          hintText: Strings.enterDesignationPosition,
+                          floatingHintText: Strings.designation,
+                          focusNode: designationFocus,
+                        ),
+
+                        // Mobile number
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          child: PrimaryTextFormField(
+                            controller: mobileNumberController,
+                            hintText: Strings.enterMobileNumber,
+                            floatingHintText: Strings.mobileNumber,
+                            keyboardType: TextInputType.number,
+                            focusNode: mobileFocus,
+                          ),
+                        ),
+
+                        // Address
+                        PrimaryTextFormField(
+                          controller: addressController,
+                          hintText: Strings.enterAddress,
+                          floatingHintText: Strings.address,
+                          keyboardType: TextInputType.streetAddress,
+                          focusNode: addressFocus,
+                        ),
+                      ],
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 22),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: PrimaryButton(
+                            onTap: onTapUploadProfilePicture,
+                            title: Strings.uploadProfilePicture,
+                            bgColor: AppColors.green5b,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PrimaryButton(
+                          onTap: submitOntap,
+                          isEnable: isEnabileSubmit,
+                          title: Strings.submit,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:mcontact/core/model/contact_details_list_temp.dart';
 import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/widget/common/image_avatar_widget.dart';
+import 'package:mcontact/widget/common/loading_overlay.dart';
 import 'package:mcontact/widget/person_details/icon_value_widget.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class PersonDetailsCardWidget extends StatefulWidget {
   final Person person;
@@ -33,6 +35,7 @@ class _PersonDetailsCardWidgetState extends State<PersonDetailsCardWidget>
       });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      generateQrData();
       fetchData();
     });
   }
@@ -57,6 +60,26 @@ class _PersonDetailsCardWidgetState extends State<PersonDetailsCardWidget>
     } else {
       animationController.reverse();
     }
+  }
+
+  String qrData = '';
+
+  void generateQrData() {
+    qrData = ''' {
+            "id":${widget.person.id},
+            "qr_token":${widget.person.qrToken},
+            "name": ${widget.person.name},
+            "email":${widget.person.email},
+            "phone_number": ${widget.person.phoneNumber},
+            "avatar_path": "",
+            "is_favorite": ${false},
+            "designation":${widget.person.designation},
+            "company_name":${widget.person.companyName},
+            "address":${widget.person.address},
+            "website":${widget.person.website}
+
+          }''';
+    setState(() {});
   }
 
   @override
@@ -91,14 +114,20 @@ class _PersonDetailsCardWidgetState extends State<PersonDetailsCardWidget>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ImageAvatar(
-                            imagePath: widget.person.avatarPath,
-                            size: 60,
+                          Hero(
+                            tag: widget.person.id.toString(),
+                            child: ImageAvatar(
+                              imagePath: widget.person.avatarPath,
+                              size: 60,
+                            ),
                           ),
-                          Icon(
-                            Icons.qr_code,
-                            size: 100,
-                            color: AppColors.black,
+                          SizedBox(
+                            height: 100,
+                            child: qrData.isEmpty
+                                ? const LoadingOverlay()
+                                : QrImageView(
+                                    data: qrData,
+                                  ),
                           )
                         ],
                       ),

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/themes/colors.dart';
 import 'package:mcontact/utils/utils.dart';
 
@@ -51,26 +54,65 @@ class ContactCardWidget extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(100),
-                    child: Image.asset(
-                      imagePath,
-                      width: 40,
+                    child: Hero(
+                      tag: id.toString(),
+                      child: imagePath.isEmpty
+                          ? Image.asset(
+                              Images.logo,
+                              width: 40,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(imagePath),
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
-                  IconButton(
-                    iconSize: 30,
-                    onPressed: () {
-                      onTapFavorite();
-                    },
-                    icon: isFavorite
-                        ? Icon(
-                            Icons.star_purple500_outlined,
-                            color: AppColors.yellow57,
-                          )
-                        : Icon(
-                            Icons.star_border,
-                            color: AppColors.greye1,
+
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Material(
+                      color: AppColors.transparent,
+                      child: InkWell(
+                        splashColor: AppColors.greyc1,
+                        onTap: () {
+                          onTapFavorite(id);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            child: isFavorite
+                                ? Icon(
+                                    Icons.star_purple500_outlined,
+                                    color: AppColors.yellow57,
+                                  )
+                                : Icon(
+                                    Icons.star_border,
+                                    color: AppColors.greye1,
+                                  ),
                           ),
+                        ),
+                      ),
+                    ),
                   )
+
+                  // IconButton(
+                  //   iconSize: 30,
+                  //   onPressed: () {
+                  //     onTapFavorite(id);
+                  //   },
+                  // icon: isFavorite
+                  //     ? Icon(
+                  //         Icons.star_purple500_outlined,
+                  //         color: AppColors.yellow57,
+                  //       )
+                  //     : Icon(
+                  //         Icons.star_border,
+                  //         color: AppColors.greye1,
+                  //       ),
+                  // )
                 ],
               ),
               Padding(

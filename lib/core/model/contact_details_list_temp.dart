@@ -5,10 +5,11 @@ class ContactsList {
         "persons": [
           {
             "id":1,
+            "qr_token":"eyijeoi38u33h83",
             "name": "John Doe",
             "email": "johndoe@example.com",
             "phone_number": "555-1234",
-            "avatar_path": "/avatars/johndoe.jpg",
+            "avatar_path": "",
             "is_favorite": true,
             "designation":"Accountant",
             "company_name":"Mannai trading company",
@@ -17,10 +18,11 @@ class ContactsList {
           },
           {
             "id":2,
+            "qr_token":"eyijewwi38u33h83",
             "name": "Jane Smith",
             "email": "janesmith@example.com",
             "phone_number": "555-5678",
-            "avatar_path": "/avatars/janesmith.jpg",
+            "avatar_path": "",
             "is_favorite": false,
             "designation":"Software engineer",
             "company_name":"Mannai trading company",
@@ -30,10 +32,11 @@ class ContactsList {
           },
           {
             "id":3,
+            "qr_token":"eyijewwi38u3383",
             "name": "David Johnson",
             "email": "davidjohnson@example.com",
             "phone_number": "555-9012",
-            "avatar_path": "/avatars/davidjohnson.jpg",
+            "avatar_path": "",
             "is_favorite": true,
             "designation":"Sales",
             "company_name":"Mannai trading company",
@@ -43,10 +46,11 @@ class ContactsList {
           },
           {
             "id":4,
+            "qr_token":"eyijewwi38u33h8fj3",
             "name": "Sarah Williams",
             "email": "sarahwilliams@example.com",
             "phone_number": "555-3456",
-            "avatar_path": "/avatars/sarahwilliams.jpg",
+            "avatar_path": "",
             "is_favorite": false,
             "designation":"Bussiness Development",
             "company_name":"Mannai trading company",
@@ -56,10 +60,11 @@ class ContactsList {
           },
           {
             "id":5,
+            "qr_token":"eyijewwi3jd83",
             "name": "Michael Brown",
             "email": "michaelbrown@example.com",
             "phone_number": "555-7890",
-            "avatar_path": "/avatars/michaelbrown.jpg",
+            "avatar_path": "",
             "is_favorite": true,
             "designation":"Accountant",
             "company_name":"Mannai trading company",
@@ -69,10 +74,11 @@ class ContactsList {
           },
           {
             "id":6,
+            "qr_token":"eyisnsewwi38u33h83",
             "name": "Emily Davis",
             "email": "emilydavis@example.com",
             "phone_number": "555-2345",
-            "avatar_path": "/avatars/emilydavis.jpg",
+            "avatar_path": "",
             "is_favorite": false,
             "designation":"Tech Lead",
             "company_name":"Mannai trading company",
@@ -82,10 +88,11 @@ class ContactsList {
           },
           {
             "id":7,
+            "qr_token":"eyijewwauaq38u33h83",
             "name": "Robert Wilson",
             "email": "robertwilson@example.com",
             "phone_number": "555-6789",
-            "avatar_path": "/avatars/robertwilson.jpg",
+            "avatar_path": "",
             "is_favorite": false,
             "designation":"QA",
             "company_name":"Mannai trading company",
@@ -95,10 +102,11 @@ class ContactsList {
           },
           {
             "id":8,
+            "qr_token":"eyijewwi18u33h83",
             "name": "Olivia Taylor",
             "email": "oliviataylor@example.com",
             "phone_number": "555-0123",
-            "avatar_path": "/avatars/oliviataylor.jpg",
+            "avatar_path": "",
             "is_favorite": true,
             "designation":"Manager",
             "company_name":"Mannai trading company",
@@ -115,6 +123,8 @@ ContactListResponseModel contactListResponseModelFromJson(String str) =>
 
 String contactListResponseModelToJson(ContactListResponseModel data) =>
     json.encode(data.toJson());
+
+Person? personFromJson(String str) => Person.fromJson(json.decode(str));
 
 class ContactListResponseModel {
   List<Person> persons;
@@ -145,6 +155,7 @@ class Person {
   String companyName;
   String address;
   String website;
+  String qrToken;
 
   Person({
     required this.name,
@@ -157,6 +168,7 @@ class Person {
     required this.companyName,
     required this.address,
     required this.website,
+    required this.qrToken,
   });
 
   factory Person.fromJson(Map<String, dynamic> json) => Person(
@@ -170,6 +182,7 @@ class Person {
         companyName: json["company_name"],
         address: json["address"],
         website: json["website"],
+        qrToken: json["qr_token"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -178,5 +191,11 @@ class Person {
         "phone_number": phoneNumber,
         "avatar_path": avatarPath,
         "is_favorite": isFavorite,
+        "id": id,
+        "designation": designation,
+        "company_name": companyName,
+        "address": address,
+        "website": website,
+        "qr_token": qrToken,
       };
 }

@@ -38,15 +38,24 @@ class PrimaryTextFormField extends StatelessWidget {
 
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode? focusNode;
+  final Function? onChang;
+
   const SearchBarWidget({
     super.key,
     required this.controller,
+    this.focusNode,
+    this.onChang,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: focusNode,
       controller: controller,
+      onChanged: (value) {
+        if (onChang != null) onChang!(value);
+      },
       decoration: const InputDecoration(
         hintText: Strings.search,
         prefixIcon: Icon(

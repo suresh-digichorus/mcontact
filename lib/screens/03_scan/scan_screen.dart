@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mcontact/core/model/contact_details_list_temp.dart';
 import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/routes/routes.dart';
 import 'package:mcontact/themes/colors.dart';
@@ -18,16 +19,35 @@ class ScanScreen extends StatefulWidget {
 class _ScanScreenState extends State<ScanScreen> {
   MobileScannerController mobileScannerController = MobileScannerController();
 
-  gotoAddOrUpdateContact() {
+  void gotoAddOrUpdateContact() {
     Navigation.pushReplacementNamed(context, Routes.profileAddOrUpdateScreen);
   }
 
-  gotoShowMyQrCodeScreen() {
+  void gotoShowMyQrCodeScreen() {
     Navigation.pushReplacementNamed(context, Routes.myQrCodeScreen);
   }
 
   void onTapUploadQr() {
     showToast(Strings.inProgress);
+  }
+
+  scanQrCode(BarcodeCapture value) async {
+    if (value.barcodes.isNotEmpty) {
+      if (value.barcodes[0].displayValue != null) {
+        var qrString = value.barcodes[0].displayValue!;
+        Person? person = personFromJson(qrString);
+        if (person != null) {
+          Navigation.popAndPushNamed(
+            context,
+            Routes.profileAddOrUpdateScreen,
+            {
+              'is_qr': true,
+              'person': person,
+            },
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -36,7 +56,9 @@ class _ScanScreenState extends State<ScanScreen> {
       children: [
         MobileScanner(
           controller: mobileScannerController,
-          onDetect: (value) {},
+          onDetect: (value) {
+            scanQrCode(value);
+          },
         ),
         Positioned(
           left: 0,

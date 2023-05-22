@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/routes/routes.dart';
+import 'package:mcontact/utils/local_storage.dart';
 import 'package:mcontact/utils/navigation.dart';
 import 'package:mcontact/utils/utils.dart';
 
@@ -14,10 +15,19 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    super.initState();
+    initData();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       fetchData();
     });
-    super.initState();
+  }
+
+  initData() async {
+    var isAppOpened = await LocalStorage.getAppOpened();
+    if (!isAppOpened) {
+      LocalStorage.initialSetContactDetails();
+      LocalStorage.setAppOpened();
+    }
   }
 
   Future<void> fetchData() async {

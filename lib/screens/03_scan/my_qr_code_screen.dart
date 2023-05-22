@@ -8,6 +8,7 @@ import 'package:mcontact/widget/common/button.dart';
 import 'package:mcontact/widget/common/image_avatar_widget.dart';
 import 'package:mcontact/widget/contact/contact_card_widget.dart';
 import 'package:mcontact/widget/person_details/icon_value_widget.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class MyQrCodeScreen extends StatefulWidget {
   const MyQrCodeScreen({super.key});
@@ -51,9 +52,9 @@ class _MyQrCodeScreenState extends State<MyQrCodeScreen> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Image.asset(
-                            Images.logo,
+                          child: SizedBox(
                             width: Utils.getScreenSize(context).width * 0.5,
+                            child: QrImageView(data: 'Please add your profile'),
                           ),
                         ),
                         const IconAndValueWidget(
@@ -95,11 +96,18 @@ class _MyQrCodeScreenState extends State<MyQrCodeScreen> {
               top: Utils.getScreenSize(context).width * 0.2 - 22.5,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  ImageAvatar(
-                    imagePath: Images.logo,
-                    size: 45,
-                  ),
+                children: [
+                  // ImageAvatar(
+                  //   imagePath: Images.logo,
+                  //   size: 45,
+                  // ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.asset(
+                      Images.logo,
+                      width: 45,
+                    ),
+                  )
                 ],
               ),
             ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mcontact/bloc/contact/contact_bloc.dart';
 import 'package:mcontact/core/model/contact_details_list_temp.dart';
 import 'package:mcontact/resources/images.dart';
 import 'package:mcontact/resources/strings.dart';
@@ -25,16 +27,20 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   TextEditingController searchController = TextEditingController();
 
   ScrollController scrollController = ScrollController();
+
+  late ContactBloc contactBloc;
+
   @override
   void initState() {
     super.initState();
+    contactBloc = BlocProvider.of<ContactBloc>(context, listen: false);
+
     fetchData();
   }
 
   Future<void> fetchData() async {
-    var contactList = ContactsList.getContactList();
-
-    contactListResponseModel = contactListResponseModelFromJson(contactList);
+    person.clear();
+    contactListResponseModel = contactBloc.contactListResponseModel;
     for (int i = 0; i < contactListResponseModel!.persons.length; i++) {
       if (contactListResponseModel!.persons[i].isFavorite) {
         person.add(contactListResponseModel!.persons[i]);
@@ -51,8 +57,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     );
   }
 
-  void onTapFavorite() {
-    showToast(Strings.inProgress);
+  void onTapFavorite(int id) {
+    contactBloc.add(AddOrRemoveFavoriteEvent(id));
+  }
+
+  void searhcOnTap() {
+    Navigation.pushNamed(context, Routes.searchScreen);
   }
 
   @override
@@ -67,41 +77,72 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           imagePath: Images.logo,
         )
       ],
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: SearchBarWidget(controller: searchController),
-              ),
-              (person.isEmpty)
-                  ? const LoadingOverlay()
-                  : Center(
-                      child: Wrap(
-                        runSpacing: 20,
-                        spacing: 20,
-                        children: person
-                            .map(
-                              (e) => ContactCardWidget(
-                                imagePath: Images.logo,
-                                name: e.name,
-                                number: e.phoneNumber,
-                                email: e.email,
-                                isFavorite: e.isFavorite,
-                                onTap: gotoPersonDetailsScreen,
-                                onTapFavorite: onTapFavorite,
-                                id: e.id,
-                              ),
-                            )
-                            .toList(),
-                      ),
+      body: BlocConsumer(
+        bloc: contactBloc,
+        listener: (context, state) {
+          if (state is AddOrRemoveFavoriteState) {
+            contactBloc.add(ContactListEvent());
+            showToast(Strings.updated);
+          }
+          if (state is ContactListState) {
+            fetchData();
+          }
+        },
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Stack(
+                      children: [
+                        SearchBarWidget(controller: searchController),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          bottom: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              searhcOnTap();
+                            },
+                          ),
+                        )
+                      ],
                     ),
-            ],
-          ),
-        ),
+                  ),
+                  (contactListResponseModel == null)
+                      ? const LoadingOverlay()
+                      : person.isEmpty
+                          ? const Center(child: Text('No favorite contact'))
+                          : Center(
+                              child: Wrap(
+                                runSpacing: 20,
+                                spacing: 20,
+                                children: person
+                                    .map(
+                                      (e) => ContactCardWidget(
+                                        imagePath: e.avatarPath,
+                                        name: e.name,
+                                        number: e.phoneNumber,
+                                        email: e.email,
+                                        isFavorite: e.isFavorite,
+                                        onTap: gotoPersonDetailsScreen,
+                                        onTapFavorite: onTapFavorite,
+                                        id: e.id,
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

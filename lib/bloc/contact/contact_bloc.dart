@@ -15,8 +15,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
 
   ContactBloc({required this.contactService}) : super(ContactInitial()) {
     on<ContactListEvent>(getContactListModel);
+    on<AddOrRemoveFavoriteEvent>(addOrRemoveFavorite);
+    on<UpdateContactEvent>(updateContact);
+    on<AddContactEvent>(addContact);
+    on<DeleteContactEvent>(deleteContact);
   }
-  getContactListModel(ContactListEvent event, Emitter emitter) async {
+  Future<void> getContactListModel(
+      ContactListEvent event, Emitter emitter) async {
     try {
       contactListResponseModel = await contactService.getContactListModel();
       if (contactListResponseModel != null) {
@@ -24,6 +29,77 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
           ContactListState(contactListResponseModel!),
         );
       }
+    } on SocketException {
+      emitter(ContactErrorState(e));
+    }
+  }
+
+  Future<void> addOrRemoveFavorite(
+      AddOrRemoveFavoriteEvent event, Emitter emitter) async {
+    try {
+      emitter(
+        AddOrRemoveFavoriteState(
+          await contactService.addOrRemoveFavorite(event.id),
+        ),
+      );
+      contactListResponseModel = await contactService.getContactListModel();
+    } on SocketException {
+      emitter(ContactErrorState(e));
+    }
+  }
+
+  Future<void> updateContact(UpdateContactEvent event, Emitter emitter) async {
+    try {
+      emitter(
+        UpdateContactState(
+          await contactService.updateContact(
+            event.id,
+            event.name,
+            event.email,
+            event.companyName,
+            event.website,
+            event.designation,
+            event.mobileNumber,
+            event.address,
+            event.imagePath,
+          ),
+        ),
+      );
+    } on SocketException {
+      emitter(ContactErrorState(e));
+    }
+  }
+
+  Future<void> addContact(AddContactEvent event, Emitter emitter) async {
+    try {
+      emitter(
+        AddContactState(
+          await contactService.addContact(
+            event.name,
+            event.email,
+            event.companyName,
+            event.website,
+            event.designation,
+            event.mobileNumber,
+            event.address,
+            event.imagePath,
+          ),
+        ),
+      );
+      contactListResponseModel = await contactService.getContactListModel();
+    } on SocketException {
+      emitter(ContactErrorState(e));
+    }
+  }
+
+  Future<void> deleteContact(DeleteContactEvent event, Emitter emitter) async {
+    try {
+      emitter(
+        DeleteContactState(
+          await contactService.deleteContact(event.id),
+        ),
+      );
+      contactListResponseModel = await contactService.getContactListModel();
     } on SocketException {
       emitter(ContactErrorState(e));
     }

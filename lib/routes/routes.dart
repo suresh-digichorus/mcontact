@@ -4,6 +4,7 @@ import 'package:mcontact/resources/strings.dart';
 import 'package:mcontact/screens/01_splash_screen/splash_screen.dart';
 import 'package:mcontact/screens/02_contact/contact_screen.dart';
 import 'package:mcontact/screens/02_contact/person_details_screen.dart';
+import 'package:mcontact/screens/02_contact/search_screen.dart';
 import 'package:mcontact/screens/03_scan/my_qr_code_screen.dart';
 import 'package:mcontact/screens/03_scan/scan_screen.dart';
 import 'package:mcontact/screens/04_favorite/favorite_screen.dart';
@@ -17,6 +18,7 @@ class Routes {
   static const personDetailsScreen = '/person-details-screen';
   static const scanScreen = '/scan-screen';
   static const myQrCodeScreen = '/my-qr-code-screen';
+  static const searchScreen = '/search-screen';
 
   static Map<String, WidgetBuilder> get buildRoutes {
     return {
@@ -57,6 +59,12 @@ class Routes {
             showAppBar: true,
             showBottomNavBar: false,
             title: Strings.showMyQr,
+          ),
+      searchScreen: (context) => const BaseLayout(
+            page: SearchScreen(),
+            showAppBar: true,
+            showBottomNavBar: false,
+            title: Strings.search,
           ),
     };
   }

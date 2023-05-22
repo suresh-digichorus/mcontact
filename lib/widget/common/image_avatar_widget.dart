@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:mcontact/resources/images.dart';
 
 class ImageAvatar extends StatelessWidget {
   final String imagePath;
@@ -9,10 +12,19 @@ class ImageAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(100),
-      child: Image.asset(
-        imagePath,
-        width: size,
-      ),
+      child: imagePath.isEmpty
+          ? Image.asset(
+              Images.logo,
+              width: size,
+            )
+          : Image.file(
+              width: size,
+              height: size,
+              File(
+                imagePath,
+              ),
+              fit: BoxFit.cover,
+            ),
     );
   }
 }
